@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/ChelseyLeonia/Desktop/circle_5/ft_containers/Vector.cpp
+Vector.hpp
+/Users/ChelseyLeonia/Desktop/circle_5/ft_containers/Vector.hpp
+
+/Users/ChelseyLeonia/Desktop/circle_5/ft_containers/Vector.hpp
+
