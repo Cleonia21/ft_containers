@@ -1,3 +1,5 @@
 cmake-build-debug
 subs
 CMakeLists.txt
+.idea
+.DS_Store
