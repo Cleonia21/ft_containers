@@ -46,8 +46,9 @@ namespace ft {
 
 		virtual ~rbt_iterator() {}
 
+        T* base() const { return _node; }
 		reference operator*() const { return _node->value; }
-		pointer operator->() const { return &_node->value; }
+		pointer operator->() const { return &(_node->value); }
 
 		rbt_iterator& operator++(void)
 		{
