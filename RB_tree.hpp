@@ -8,7 +8,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <memory>
-#include "rbt_iterator.hpp"
 
 namespace ft {
 
@@ -69,26 +68,268 @@ namespace ft {
             return *this;
         }
 
-//		bool operator==(const RB_node& nd)
-//		{
-//			if (value == nd.value)
-//				return (true);
-//			return (false);
-//		}
-
     };
 
+	template<typename T>
+	class rbt_iterator : ft::iterator<ft::bidirectional_iterator_tag, T> {
+	public:
+		typedef bidirectional_iterator_tag	iterator_category;
+		typedef typename T::value_type 		value_type;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::difference_type	difference_type;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::pointer	pointer;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference	reference;
+
+		rbt_iterator()
+				:
+				_node(),
+				_last() {}
+
+		rbt_iterator(T* node, T* last)
+				:
+				_node(node),
+				_last(last) {}
+
+		rbt_iterator(const rbt_iterator &p)
+				:
+				_node(p._node),
+				_last(p._last) {}
+
+		rbt_iterator &operator=(const rbt_iterator &p) {
+			if (this == &p)
+				return (*this);
+			this->_node = p._node;
+			this->_last = p._last;
+			return *this;
+		}
+
+		virtual ~rbt_iterator() {}
+
+		T* base() const { return _node; }
+		reference operator*() const { return _node->value; }
+		pointer operator->() const { return &(_node->value); }
+
+		rbt_iterator& operator++(void)
+		{
+			if (_node->right)
+			{
+				_node = _node->right;
+				while (_node->left)
+					_node = _node->left;
+			}
+			else
+			{
+				while (true)
+				{
+					if (_node->parent == nullptr)
+					{
+						_node = _last;
+						break ;
+					}
+					else if (_node == _node->parent->right)
+						_node = _node->parent;
+					else if (_node == _node->parent->left)
+					{
+						_node = _node->parent;
+						break ;
+					}
+				}
+			}
+			return *this;
+		}
+
+		rbt_iterator operator++(int)
+		{
+			rbt_iterator ret(*this);
+			operator++();
+			return ret;
+		}
+
+		rbt_iterator& operator--(void)
+		{
+			if (_node->left)
+			{
+				_node = _node->left;
+				while (_node->right)
+					_node = _node->right;
+			}
+			else
+			{
+				while (true)
+				{
+					if (_node->parent == nullptr)
+					{
+						_node = _last;
+						break ;
+					}
+					else if (_node == _node->parent->left)
+						_node = _node->parent;
+					else if (_node == _node->parent->right || _node == _last)
+					{
+						_node = _node->parent;
+						break ;
+					}
+				}
+			}
+			return *this;
+		}
+
+		rbt_iterator operator--(int)
+		{
+			rbt_iterator ret(*this);
+			operator--();
+			return ret;
+		}
+
+		bool operator!=(const rbt_iterator& bst_it)
+		{ return (this->_node != bst_it._node); }
+
+		bool operator==(const rbt_iterator& bst_it)
+		{ return (!operator!=(bst_it)); }
+
+		T* _node;
+		T* _last;
+	};
+
+	template<typename T>
+	class rbt_const_iterator : ft::iterator<ft::bidirectional_iterator_tag, T> {
+	public:
+		typedef bidirectional_iterator_tag	iterator_category;
+		typedef typename T::value_type 		value_type;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::difference_type	difference_type;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, const value_type>::pointer	pointer;
+		typedef typename ft::iterator<ft::bidirectional_iterator_tag, const value_type>::reference	reference;
+
+		rbt_const_iterator()
+				:
+				_node(),
+				_last() {}
+
+		rbt_const_iterator(T* node, T* last)
+				:
+				_node(node),
+				_last(last) {}
+
+		rbt_const_iterator(const rbt_const_iterator &p)
+				:
+				_node(p._node),
+				_last(p._last) {}
+
+		rbt_const_iterator(const rbt_iterator<T> &p)
+				:
+				_node(p._node),
+				_last(p._last) {}
+
+		rbt_const_iterator &operator=(const rbt_const_iterator &p) {
+			if (this == &p)
+				return (*this);
+			this->_node = p._node;
+			this->_last = p._last;
+			return *this;
+		}
+
+		virtual ~rbt_const_iterator() {}
+
+		T* base() const { return _node; }
+		reference operator*() const { return _node->value; }
+		pointer operator->() const { return &(_node->value); }
+
+		rbt_const_iterator& operator++(void)
+		{
+			if (_node->right)
+			{
+				_node = _node->right;
+				while (_node->left)
+					_node = _node->left;
+			}
+			else
+			{
+				while (true)
+				{
+					if (_node->parent == nullptr)
+					{
+						_node = _last;
+						break ;
+					}
+					else if (_node == _node->parent->right)
+						_node = _node->parent;
+					else if (_node == _node->parent->left)
+					{
+						_node = _node->parent;
+						break ;
+					}
+				}
+			}
+			return *this;
+		}
+
+		rbt_const_iterator operator++(int)
+		{
+			rbt_const_iterator ret(*this);
+			operator++();
+			return ret;
+		}
+
+		rbt_const_iterator& operator--(void)
+		{
+			if (_node->left)
+			{
+				_node = _node->left;
+				while (_node->right)
+					_node = _node->right;
+			}
+			else
+			{
+				while (true)
+				{
+					if (_node->parent == nullptr)
+					{
+						_node = _last;
+						break ;
+					}
+					else if (_node == _node->parent->left)
+						_node = _node->parent;
+					else if (_node == _node->parent->right || _node == _last)
+					{
+						_node = _node->parent;
+						break ;
+					}
+				}
+			}
+			return *this;
+		}
+
+		rbt_const_iterator operator--(int)
+		{
+			rbt_const_iterator ret(*this);
+			operator--();
+			return ret;
+		}
+
+		bool operator!=(const rbt_const_iterator& bst_it)
+		{ return (this->_node != bst_it._node); }
+
+		bool operator==(const rbt_const_iterator& bst_it)
+		{ return (!operator!=(bst_it)); }
+
+		T* _node;
+		T* _last;
+	};
+
     template<class T, class Compare = std::less<T>, class Node = RB_node<T>,
-            class Type_Alloc = std::allocator<T>, class Node_Alloc = std::allocator<Node> >
+            class Alloc = std::allocator<Node> >
     class RB_tree
     {
     public:
 		typedef typename T::first_type first_type;
-		typedef Node node;
-        typedef ft::rbt_iterator<Node> iterator;
-		typedef ft::rbt_const_iterator<Node> const_iterator;
+		typedef Node	node;
+		typedef Node*	node_pointer;
+		typedef Node&	node_reference;
+		typedef Alloc	allocator_type;
+        typedef ft::rbt_iterator<node> iterator;
+		typedef ft::rbt_const_iterator<node> const_iterator;
+		typedef typename allocator_type::size_type size_type;
 
-        RB_tree(const Node_Alloc &alloc = Node_Alloc())
+        RB_tree(const allocator_type &alloc = allocator_type())
                 :
                 _root(nullptr),
                 _alloc(alloc),
@@ -99,14 +340,15 @@ namespace ft {
             _last->left = _last->right = _last->parent = nullptr;
         }
 
-        ~RB_tree()
-        {
-            destroy();
-        }
+        ~RB_tree() {
+			destroy();
+			_alloc.destroy(_last);
+			_alloc.deallocate(_last, 1);
+		}
 
-        ft::pair<iterator, bool> insert(T key, Node* position)
+        ft::pair<iterator, bool> insert(T key, node* position)
         {
-            Node* tmp = _root;
+            node* tmp = _root;
             if (position && position->parent)
             {
                 if (position == position->parent->left &&
@@ -117,7 +359,7 @@ namespace ft {
                     tmp = position;
             }
 
-            Node* previous = nullptr;
+            node* previous = nullptr;
             while (tmp != nullptr)
             {
                 previous = tmp;
@@ -128,7 +370,7 @@ namespace ft {
                 else
                     return ft::make_pair(iterator(previous, end()), false);
             }
-            Node* new_node = _alloc.allocate(1);
+            node* new_node = _alloc.allocate(1);
             _alloc.construct(new_node, key);
             new_node->parent = previous;
             if (previous != nullptr)
@@ -146,9 +388,9 @@ namespace ft {
             return ft::make_pair(iterator(new_node, end()), true);
         }
 
-        size_t erase(T key)
+		size_type erase(T key)
         {
-            Node* node = search(key, _root);
+            node* node = search(key, _root);
             if (node == nullptr)
                 return 0;
             erase(node);
@@ -158,8 +400,8 @@ namespace ft {
         void erase(Node* node)
         {
             _size--;
+            node_pointer child;
 
-            Node* child;
             if (node->right && node->left)
             {
                 child = node->right;
@@ -198,7 +440,7 @@ namespace ft {
             _alloc.deallocate(node, 1);
         }
 
-		void swap_feedback(Node *node)
+		void swap_feedback(node *node)
 		{
 			if (!node)
 				return ;
@@ -208,7 +450,7 @@ namespace ft {
 				node->right->parent = node;
 		}
 
-		void swap_node(Node* a, Node *b)
+		void swap_node(node* a, node *b)
 		{
 			node tmp(*b);
 			b->color = a->color;
@@ -257,7 +499,7 @@ namespace ft {
         {
             if (this == &p)
                 return ;
-            Node* tmp = _root;
+            node* tmp = _root;
             _root = p._root;
             p._root = tmp;
 
@@ -269,14 +511,14 @@ namespace ft {
 			_compare = p._compare;
 			p._compare = comp;
 
-			size_t size = _size;
+			size_type size = _size;
 			_size = p._size;
 			p._size = size;
         }
 
-        Node* search_by_key(T& value) const
+        node* search_by_key(T& value) const
         {
-            Node* tmp = search(value, _root);
+            node* tmp = search(value, _root);
             if (!tmp)
                 return _last;
             return tmp;
@@ -287,30 +529,30 @@ namespace ft {
             print(_root);
         }
 
-        Node* end() const
+        node* end() const
         {
             if (_root == nullptr)
                 return _last;
-            Node* tmp = _root;
+            node* tmp = _root;
             while (tmp->right)
                 tmp = tmp->right;
             _last->parent = tmp;
             return _last;
         }
 
-        Node* begin() const
+        node* begin() const
         {
             if (_root == nullptr)
                 return _last;
-            Node* tmp = _root;
+            node* tmp = _root;
             while (tmp->left)
                 tmp = tmp->left;
             return tmp;
         }
 
-        size_t size() const { return _size; }
+		size_type size() const { return _size; }
 
-		size_t max_size() const { return _alloc.max_size(); }
+		size_type max_size() const { return _alloc.max_size(); }
 
         void destroy()
         {
@@ -321,7 +563,7 @@ namespace ft {
 
     private:
 
-        void erase_fix(Node* parent, Node* node)
+        void erase_fix(node* parent, node* node)
         {
             // case 1
             if (parent == nullptr)
@@ -331,7 +573,7 @@ namespace ft {
             }
 
             // case 2
-            Node* sibling = get_sibling(parent, node);
+            node_pointer sibling = get_sibling(parent, node);
             if (sibling->color == red)
             {
                 parent->color = red;
@@ -409,7 +651,7 @@ namespace ft {
             }
         }
 
-        Node* get_sibling(Node* parent, Node* node)
+        node* get_sibling(node* parent, node* node)
         {
             if (node == parent->left)
                 return parent->right;
@@ -417,7 +659,7 @@ namespace ft {
                 return parent->left;
         }
 
-        Node* get_brother(Node* node)
+        node* get_brother(node* node)
         {
             if (node->parent && node == node->parent->left)
                 return node->parent->right;
@@ -425,7 +667,7 @@ namespace ft {
                 return node->parent->left;
         }
 
-        void destroy(Node* node)
+        void destroy(node* node)
         {
             if (node == nullptr)
                 return ;
@@ -436,7 +678,7 @@ namespace ft {
             node = nullptr;
         }
 
-        void print(Node *node)
+        void print(node *node)
         {
             if (node == nullptr)
                 return;
@@ -454,7 +696,7 @@ namespace ft {
             print(node->right);
         }
 
-        Node* search(T& value, Node *node) const
+        node* search(T& value, node *node) const
         {
             if (node == nullptr || (!_compare(node->value.first, value.first)
                                     && (!_compare(value.first, node->value.first))))
@@ -466,7 +708,7 @@ namespace ft {
             return nullptr;
         }
 
-        Node* insert_fix(Node* node)
+        node* insert_fix(node* node)
         {
             if (node->parent == nullptr)
             {
@@ -476,8 +718,8 @@ namespace ft {
             if (node->parent->color == black)
                 return node;
 
-            Node* grandparent = node->parent->parent;
-            Node* uncle = nullptr;
+            node_pointer grandparent = node->parent->parent;
+            node_pointer uncle = nullptr;
             if (grandparent)
             {
                 uncle = grandparent->right;
@@ -515,9 +757,9 @@ namespace ft {
             return node;
         }
 
-        void left_rotate(Node* node)
+        void left_rotate(node* node)
         {
-            Node* pivot = node->right;
+            node_pointer pivot = node->right;
             pivot->parent = node->parent;
             if (node->parent != nullptr)
             {
@@ -536,9 +778,9 @@ namespace ft {
                 _root = pivot;
         }
 
-        void right_rotate(Node* node)
+        void right_rotate(node* node)
         {
-            Node* pivot = node->left;
+            node_pointer pivot = node->left;
             pivot->parent = node->parent;
             if (node->parent != nullptr)
             {
@@ -557,11 +799,11 @@ namespace ft {
                 _root = pivot;
         }
 
-        Node* _root;
-		Node_Alloc _alloc;
-        Node* _last;
+		node_pointer _root;
+		allocator_type _alloc;
+        node_pointer _last;
         Compare _compare;
-        size_t _size;
+		size_type _size;
     };
 
 }

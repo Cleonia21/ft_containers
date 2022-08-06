@@ -49,7 +49,6 @@ void	printSize(T_MAP const &mp, bool print_content = 1)
 	std::cout << "###############################################" << std::endl;
 }
 
-
 int		main(void)
 {
 	std::map<int, int> mp1;
