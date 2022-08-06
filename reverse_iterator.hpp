@@ -24,7 +24,7 @@ namespace ft
 
 		reverse_iterator()
 			:
-			_elem(nullptr) {}
+			_elem() {}
 
 		explicit reverse_iterator (iterator_type it)
 			:

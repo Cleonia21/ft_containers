@@ -33,9 +33,9 @@ namespace ft {
 				first(a),
 				second(b) {}
 
-        pair& operator= (const pair& pr)
+        pair& operator=(const pair& pr)
         {
-            if (*this == pr)
+            if (this == &pr)
                 return (*this);
             this->first = pr.first;
             this->second = pr.second;

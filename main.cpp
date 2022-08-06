@@ -1,4 +1,3 @@
-#include <iostream>
 #include "vector.hpp"
 #include "reverse_iterator.hpp"
 #include <vector>
@@ -7,91 +6,57 @@
 #include "rbt_iterator.hpp"
 #include "RB_tree.hpp"
 
-void print(ft::map<int, int>::iterator begin, ft::map<int, int>::iterator end)
+#include <list>
+
+#define TESTED_NAMESPACE ft
+
+#define _pair TESTED_NAMESPACE::pair
+//#define T1 char
+//#define T2 int
+//typedef _pair<const T1, T2> T3;
+
+#define T1 int
+#define T2 std::string
+typedef _pair<const T1, T2> T3;
+
+template <class T>
+void	is_empty(T const &mp)
 {
-    while (begin != end)
-    {
-        std::cout << "{" << begin->first << "," << begin->second << "} ";
-        begin++;
-    }
-    std::cout << std::endl;
+	std::cout << "is_empty: " << mp.empty() << std::endl;
 }
 
-int		main()
+template <typename T>
+std::string	printPair(const T &iterator, bool nl = true, std::ostream &o = std::cout)
 {
-    /*
-    std::map<int, char> mp;
+	o << "key: " << iterator->first << " | value: " << iterator->second;
+	if (nl)
+		o << std::endl;
+	return ("");
+}
 
-    mp.insert({1, 'a'});
-    mp.insert({2, 'b'});
-    mp.insert({3, 'c'});
-    mp.insert({4, 'd'});
-    std::pair<std::map<int, char>::iterator , bool> p = mp.insert({5, 'e'});
-
-    p.first++;
-    if (p.first == mp.end())
-        std::cout << "je" << std::endl;
-//    p.first++;
-    mp.insert(p.first, {0, '-'});
-
-    std::map<int, char>::iterator it = mp.find(0);
-
-    if (it != mp.end())
-        std::cout << (*it).second << std::endl;
-*/
-
-    ft::map<int, int> m1;
-    ft::map<int, int> m2;
-
-    for (int i = 0; i < 10; i++)
-    {
-        m1.insert(ft::make_pair(i, i * i));
-        m2.insert(ft::make_pair(i * i, i));
-    }
-//
-//    print(m1.begin(), m1.end());
-//    print(m2.begin(), m2.end());
-//
-//    m1.swap(m2);
-//
-//    print(m1.begin(), m1.end());
-//    print(m2.begin(), m2.end());
-
-//    m1.clear();
-//    if (!(m1.begin() != m1.end()))
-//        std::cout << "Yes, baby!" << std::endl;
-
-    /*
-    std::vector<ft::pair<int, int>> vct;
-
-    for (int i = 0; i < 10; i++)
-        vct.push_back(ft::make_pair(i, i * i));
-
-    mp.insert(vct.begin(), vct.end());
-     */
+template <typename T_MAP>
+void	printSize(T_MAP const &mp, bool print_content = 1)
+{
+	std::cout << "size: " << mp.size() << std::endl;
+	std::cout << "max_size: " << mp.max_size() << std::endl;
+	if (print_content)
+	{
+		typename T_MAP::const_iterator it = mp.begin(), ite = mp.end();
+		std::cout << std::endl << "Content is:" << std::endl;
+		for (; it != ite; ++it)
+			std::cout << "- " << printPair(it, false) << std::endl;
+	}
+	std::cout << "###############################################" << std::endl;
+}
 
 
-//	ft::RB_tree<int> tree;
-//	ft::RB_node<int> *end;
-//
-//	ft::RB_node<int> *begin = tree.insert(0);
-//
-//	for (int i = 1; i < 10; i++) // 0-9
-//		tree.insert(i);
-//	for (int i = 30; i > 20; i--) // 30-21
-//		tree.insert(i);
-//	for (int i = 10; i < 20; i++) // 10-19
-//		tree.insert(i);
-//
-//	end = tree.end();
-//
-//	ft::rbt_iterator<ft::RB_node<int> > itr(begin, end);
-//	ft::rbt_iterator<ft::RB_node<int> > itr2(end, end);
-//
-//	while (--itr2 != itr)
-//	{
-//		std::cout << *itr2 << std::endl;
-//	}
+int		main(void)
+{
+	std::map<int, int> mp1;
+	std::map<int, int> mp2;
 
+	if (mp1 > mp1)
+		std::cout << "Yes" << std::endl;
 
+	return (0);
 }

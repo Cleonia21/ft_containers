@@ -90,12 +90,10 @@ namespace ft {
 				_start(nullptr),
 				_end(nullptr),
 				_endCapacity(nullptr) {
-//		Debug("Copy constructor coled");
 			insert(this->begin(), x.begin(), x.end());
 		}
 
 		vector &operator=(const vector &p) {
-//		Debug("Copy operator coled");
 			if (*this == p)
 				return (*this);
 			clear();

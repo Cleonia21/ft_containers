@@ -50,7 +50,12 @@ namespace ft {
                 parent(a.parent),
                 color(a.color) {}
 
-        virtual ~RB_node() {}
+        virtual ~RB_node()
+		{
+			left = nullptr;
+			right = nullptr;
+			parent = nullptr;
+		}
 
         RB_node &operator=(const RB_node &a)
         {
@@ -78,7 +83,10 @@ namespace ft {
     class RB_tree
     {
     public:
+		typedef typename T::first_type first_type;
+		typedef Node node;
         typedef ft::rbt_iterator<Node> iterator;
+		typedef ft::rbt_const_iterator<Node> const_iterator;
 
         RB_tree(const Node_Alloc &alloc = Node_Alloc())
                 :
@@ -133,6 +141,8 @@ namespace ft {
             else
                 _root = new_node;
 
+			_size++;
+			insert_fix(new_node);
             return ft::make_pair(iterator(new_node, end()), true);
         }
 
@@ -155,9 +165,9 @@ namespace ft {
                 child = node->right;
                 while (child->left)
                     child = child->left;
-//				swap(node, child);
-                node->value = child->value;
-                node = child;
+				swap_node(node, child);
+				if (child->parent == nullptr)
+					_root = child;
             }
 
             if (node->left)
@@ -188,6 +198,61 @@ namespace ft {
             _alloc.deallocate(node, 1);
         }
 
+		void swap_feedback(Node *node)
+		{
+			if (!node)
+				return ;
+			if (node->left)
+				node->left->parent = node;
+			if (node->right)
+				node->right->parent = node;
+		}
+
+		void swap_node(Node* a, Node *b)
+		{
+			node tmp(*b);
+			b->color = a->color;
+			a->color = tmp.color;
+
+			if (a == b->parent) {
+				b->parent = a->parent;
+				a->parent = b;
+				if (b->parent && a == b->parent->left)
+					b->parent->left = b;
+				else if (b->parent)
+					b->parent->right = b;
+				if (b == a->left) {
+					b->left = a;
+					b->right = a->right;
+					if (b->right)
+						b->right->parent = b;
+				} else {
+					b->right = a;
+					b->left = a->left;
+					if (b->left)
+						b->left->parent = b;
+				}
+			} else {
+				b->parent = a->parent;
+				a->parent = tmp.parent;
+				if (a->parent && a == a->parent->left)
+					a->parent->left = b;
+				else if (a->parent)
+					a->parent->right = b;
+				if (b->parent && b == b->parent->left)
+					b->parent->left = a;
+				else if (b->parent)
+					b->parent->right = a;
+
+				b->left = a->left;
+				b->right = a->right;
+				swap_feedback(b);
+			}
+			a->left = tmp.left;
+			a->right = tmp.right;
+			swap_feedback(a);
+		}
+
         void swap(RB_tree& p)
         {
             if (this == &p)
@@ -199,9 +264,17 @@ namespace ft {
             tmp = _last;
             _last = p._last;
             p._last = tmp;
+
+			Compare comp = _compare;
+			_compare = p._compare;
+			p._compare = comp;
+
+			size_t size = _size;
+			_size = p._size;
+			p._size = size;
         }
 
-        Node* search_by_key(T& value)
+        Node* search_by_key(T& value) const
         {
             Node* tmp = search(value, _root);
             if (!tmp)
@@ -214,7 +287,7 @@ namespace ft {
             print(_root);
         }
 
-        Node* end()
+        Node* end() const
         {
             if (_root == nullptr)
                 return _last;
@@ -225,7 +298,7 @@ namespace ft {
             return _last;
         }
 
-        Node* begin()
+        Node* begin() const
         {
             if (_root == nullptr)
                 return _last;
@@ -235,12 +308,15 @@ namespace ft {
             return tmp;
         }
 
-        size_t size() { return _size; }
+        size_t size() const { return _size; }
+
+		size_t max_size() const { return _alloc.max_size(); }
 
         void destroy()
         {
             destroy(_root);
             _root = nullptr;
+			_size = 0;
         }
 
     private:
@@ -331,136 +407,6 @@ namespace ft {
                     sibling->left->color = black;
                 right_rotate(parent);
             }
-
-
-/*
-			Node* child = node->left;
-			RBT_color l_child_color = black, r_child_color = black;
-			if (child->left)
-				l_child_color = child->left->color;
-			if (child->right)
-				r_child_color = child->right->color;
-
-			//КЧ1
-			if (node->color == red &&
-				l_child_color == black &&
-				r_child_color == black)
-			{
-				node->color = black;
-				child->color = red;
-				return ;
-			}
-
-			//КЧ2
-			if (node->color == red &&
-				child->color == black &&
-				l_child_color == red)
-			{
-				node->color = black;
-				child->color = red;
-				child->left->color = black;
-				right_rotate(node);
-				return ;
-			}
-
-*/
-/*
-			// case 1
-			if (!node->parent)
-			{
-				std::cout << "Not parent" << std::endl;
-				_root = node;
-				return;
-			}
-
-			// case 2
-			Node* brother = get_brother(node);
-			if (!brother)
-			{
-				std::cout << "Not brother" << std::endl;
-				return ;
-			}
-			if (brother->color == red)
-			{
-				node->parent->color = red;
-				brother->color = black;
-				if (node == node->parent->left)
-					left_rotate(node->parent);
-				else
-					right_rotate(node->parent);
-			}
-
-			// case 3
-			brother = get_brother(node);
-			if (!brother)
-			{
-				std::cout << "Not brother" << std::endl;
-				return ;
-			}
-			if (node->parent->color == black &&
-				brother->color == black &&
-				(!brother->left || brother->left->color == black) &&
-				(!brother->right || brother->right->color == black))
-			{
-				brother->color = red;
-				erase_fix(node->parent);
-				return ;
-			}
-
-			// case 4
-			if (node->parent->color == red &&
-				brother->color == black &&
-				(!brother->left || brother->left->color == black) &&
-				(!brother->right || brother->right->color == black))
-			{
-				brother->color = red;
-				node->parent->color = black;
-				return ;
-			}
-
-			// case 5
-			if (brother->color == black)
-			{
-				if ((node == node->parent->left) &&
-					(!brother->right || brother->right->color == black) &&
-					(brother->left && brother->left->color == red))
-				{
-					brother->color = red;
-					brother->left->color = black;
-					right_rotate(brother);
-				}
-				else if ((node == node->parent->right) &&
-					(!brother->right || brother->right->color == red) &&
-					(brother->left && brother->left->color == black))
-				{
-					brother->color = red;
-					brother->right->color = black;
-					right_rotate(brother);
-				}
-			}
-
-			// case 6
-			brother = get_brother(node);
-			if (!brother)
-			{
-				std::cout << "Not brother" << std::endl;
-				return ;
-			}
-			if (!node->parent)
-			{
-				std::cout << "Not parent" << std::endl;
-				return ;
-			}
-			brother->color = node->parent->color;
-			node->parent->color = black;
-			if (node == node->parent->left) {
-				brother->right->color = black;
-				left_rotate(node->parent);
-			} else {
-				brother->left->color = black;
-				right_rotate(node->parent);
-			}
-*/
         }
 
         Node* get_sibling(Node* parent, Node* node)
@@ -508,7 +454,7 @@ namespace ft {
             print(node->right);
         }
 
-        Node* search(T& value, Node *node)
+        Node* search(T& value, Node *node) const
         {
             if (node == nullptr || (!_compare(node->value.first, value.first)
                                     && (!_compare(value.first, node->value.first))))
@@ -571,7 +517,6 @@ namespace ft {
 
         void left_rotate(Node* node)
         {
-//			std::cout << "left rotate" << std::endl;
             Node* pivot = node->right;
             pivot->parent = node->parent;
             if (node->parent != nullptr)
@@ -593,7 +538,6 @@ namespace ft {
 
         void right_rotate(Node* node)
         {
-//			std::cout << "right rotate" << std::endl;
             Node* pivot = node->left;
             pivot->parent = node->parent;
             if (node->parent != nullptr)
@@ -613,8 +557,8 @@ namespace ft {
                 _root = pivot;
         }
 
-        Node_Alloc _alloc;
         Node* _root;
+		Node_Alloc _alloc;
         Node* _last;
         Compare _compare;
         size_t _size;
