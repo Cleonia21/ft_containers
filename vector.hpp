@@ -44,7 +44,6 @@ namespace ft {
 			   const allocator_type &alloc = allocator_type())
 				:
 				_alloc(alloc) {
-//		Debug("Size constructor coled");
 			_start = _alloc.allocate(n);
 			_endCapacity = _start + n;
 			_end = _start;
@@ -53,18 +52,6 @@ namespace ft {
 				_end++;
 			}
 		}
-
-		/*
-		 * Тип T включается как тип члена enable_if::type, если Cond имеет значение true.
-		 * В противном случае enable_if::type не определен. Полезно, когда определенное условие не выполняется,
-		 * в этом случае член enable_if::type не будет определен, и попытка компиляции с использованием to
-		 * завершится ошибкой. (Если это используется в шаблоне функции, например, если тип не определен,
-		 * компилятор не будет компилировать и использовать функцию).
-		 *
-		 *
-		 * template<bool Cond, class T = void> struct enable_if {};
-			template<class T> struct enable_if<true, T> { typedef T type; };
-		 */
 
 		template<class InputIterator>
 		vector(InputIterator first, InputIterator last,
@@ -106,22 +93,18 @@ namespace ft {
 		}
 
 		iterator begin() {
-//		Debug("Begin coled");
 			return iterator(_start);
 		}
 
 		const_iterator begin() const {
-//		Debug("Const Begin coled");
 			return const_iterator(_start);
 		}
 
 		iterator end() {
-//		Debug("End coled");
 			return iterator(_end);
 		}
 
 		const_iterator end() const {
-//		Debug("Const End coled");
 			return const_iterator(_end);
 		}
 
@@ -142,17 +125,14 @@ namespace ft {
 		}
 
 		size_type size() const {
-//		Debug("Size coled");
 			return (_end - _start);
 		}
 
 		size_type max_size() const {
-//		Debug("Size coled");
 			return allocator_type().max_size();
 		}
 
 		void resize(size_type n, value_type val = value_type()) {
-//		Debug("Resize coled");
 			if (n > capacity())
 				this->reserve(n);
 			if (n < (unsigned long) (_end - _start))
@@ -164,12 +144,10 @@ namespace ft {
 		}
 
 		size_type capacity() const {
-//		Debug("Capacity coled");
 			return (_endCapacity - _start);
 		}
 
 		bool empty() const {
-//		Debug("Empty coled");
 			return (this->size() == 0);
 		}
 
@@ -200,53 +178,44 @@ namespace ft {
 		}
 
 		reference operator[](size_type n) {
-//		Debug("Operator[] coled");
 			return *(_start + n);
 		}
 
 		const_reference operator[](size_type n) const {
-//		Debug("Const Operator[] coled");
 			return *(_start + n);
 		}
 
 		reference at(size_type n) {
-//		Debug("At coled");
 			if (n >= this->size())
 				throw std::out_of_range("vector::_M_range_check");
 			return this->operator[](n);
 		}
 
 		const_reference at(size_type n) const {
-//		Debug("Const At coled");
 			if (n >= this->size())
 				throw std::out_of_range("vector::_M_range_check");
 			return this->operator[](n);
 		}
 
 		reference front() {
-//		Debug("Front coled");
 			return *_start;
 		}
 
 		const_reference front() const {
-//		Debug("Const Front coled");
 			return *_start;
 		}
 
 		reference back() {
-//		Debug("Back coled");
 			return *(_end - 1);
 		}
 
 		const_reference back() const {
-//		Debug("Const Back coled");
 			return *(_end - 1);
 		}
 
 		template<class InputIterator>
 		void assign(InputIterator first, InputIterator last,
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type * = nullptr) {
-//		Debug("Assign on iterator coled");
 			this->clear();
 			size_type n = ft::distance(first, last);
 			if (n > this->capacity())
@@ -259,7 +228,6 @@ namespace ft {
 		}
 
 		void assign(size_type n, const value_type &val) {
-//		Debug("Assign on val coled");
 			this->clear();
 			if (n > this->capacity())
 				this->reserve(n);
@@ -283,18 +251,14 @@ namespace ft {
 			}
 		}
 
-		iterator insert(iterator position, const value_type &val) // check to not valid iterator
+		iterator insert(iterator position, const value_type &val)
 		{
-//		Debug("Insert coled");
-
 			pointer tmp = shift(position, 1);
 			_alloc.construct(tmp, val);
 			return (iterator(tmp));
 		}
 
 		void insert(iterator position, size_type n, const value_type &val) {
-//		Debug("Insert with num interval coled");
-
 			pointer tmp = shift(position, n);
 			while (n--)
 				_alloc.construct(tmp++, val);
@@ -304,7 +268,6 @@ namespace ft {
 		template<class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type * = nullptr) {
-//		ft::Debug("Insert with iterators coled");
 			size_type n = ft::distance(first, last);
 			pointer tmp = shift(position, n);
 			while (&(*first) != &(*last)) {
@@ -313,7 +276,6 @@ namespace ft {
 				first++;
 			}
 		}
-
 
 		iterator erase(iterator position) {
 			pointer tmp = _start;
@@ -352,7 +314,6 @@ namespace ft {
 		}
 
 		void swap(vector &x) {
-//		Debug("Swap coled");
 			if (x == *this)
 				return;
 
@@ -373,12 +334,11 @@ namespace ft {
 		}
 
 		void clear() {
-//		Debug("Clear coled");
 			if (_start == _end)
 				return;
 			while (_start != --_end)
 				_alloc.destroy(_end);
-			_alloc.destroy(_end); // this`s normal?
+			_alloc.destroy(_end);
 			_alloc.deallocate(_start, _endCapacity - _start);
 			_start = nullptr;
 			_end = nullptr;
@@ -396,11 +356,6 @@ namespace ft {
 		pointer _end;
 		pointer _endCapacity;
 
-		/*
-		 * Функция вставки в середину массива
-		 * n не инициализированных элементов
-		 * после итератора position - 1
-		 */
 		pointer shift(iterator &position, size_type n) {
 			if (size() + n > capacity()) {
 				size_type newCapacity = size() + n;
@@ -425,6 +380,8 @@ namespace ft {
 					_end += n;
 
 				prev_start -= prev_size;
+				if (!prev_start)
+					return _start + posLen;
 				while (prev_start != prev_end) {
 					_alloc.destroy(prev_start);
 					prev_start++;
